@@ -19,10 +19,13 @@ export default function TablesPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.ok) {
-        setTables(await response.json());
+        const data = await response.json();
+        setTables(Array.isArray(data) ? data : []);
+      } else {
+        console.error('Failed to fetch tables:', response.status, response.statusText);
       }
     } catch (error) {
-      console.error('Failed to fetch tables', error);
+      console.error('Error fetching tables:', error);
     } finally {
       setLoading(false);
     }
@@ -31,7 +34,7 @@ export default function TablesPage() {
   const updateTableStatus = async (tableId: number, status: string) => {
     const token = localStorage.getItem('token');
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tables/${tableId}/status`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tables/${tableId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -39,9 +42,13 @@ export default function TablesPage() {
         },
         body: JSON.stringify({ status }),
       });
-      fetchTables();
+      if (response.ok) {
+        fetchTables();
+      } else {
+        console.error('Failed to update table status:', response.status);
+      }
     } catch (error) {
-      console.error('Failed to update table status', error);
+      console.error('Error updating table status:', error);
     }
   };
 
@@ -81,6 +88,10 @@ export default function TablesPage() {
           <CardDescription>Total: {tables.length} tables</CardDescription>
         </CardHeader>
         <CardContent>
+          {loading && <p className="text-center text-gray-500">Loading tables...</p>}
+          {!loading && tables.length === 0 && (
+            <p className="text-center text-gray-500">No tables found. Please check the database.</p>
+          )}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {tables.map((table: any) => {
               const statusColors = {

@@ -58,12 +58,16 @@ export default function CategoriesPage() {
         fetchCategories();
         alert('Category added successfully');
       } else {
-        const errorData = await response.json();
-        alert(`Failed to add category: ${errorData.message || 'Unknown error'}`);
+        try {
+          const errorData = await response.json();
+          alert(`Failed to add category: ${errorData.message || `Status ${response.status}`}`);
+        } catch {
+          alert(`Failed to add category: Server returned ${response.status} ${response.statusText}`);
+        }
       }
     } catch (error) {
       console.error('Failed to add category', error);
-      alert('Error adding category');
+      alert(`Error: ${error instanceof Error ? error.message : 'Failed to add category'}`);
     }
   };
 
@@ -81,12 +85,16 @@ export default function CategoriesPage() {
         fetchCategories();
         alert('Category deleted successfully');
       } else {
-        const errorData = await response.json();
-        alert(`Failed to delete category: ${errorData.message || 'Unknown error'}`);
+        try {
+          const errorData = await response.json();
+          alert(`Failed to delete category: ${errorData.message || `Status ${response.status}`}`);
+        } catch {
+          alert(`Failed to delete category: Server returned ${response.status} ${response.statusText}`);
+        }
       }
     } catch (error) {
       console.error('Failed to delete category', error);
-      alert('Error deleting category');
+      alert(`Error: ${error instanceof Error ? error.message : 'Failed to delete category'}`);
     }
   };
 
@@ -113,12 +121,16 @@ export default function CategoriesPage() {
         fetchCategories();
         alert('Category updated successfully');
       } else {
-        const errorData = await response.json();
-        alert(`Failed to update category: ${errorData.message || 'Unknown error'}`);
+        try {
+          const errorData = await response.json();
+          alert(`Failed to update category: ${errorData.message || `Status ${response.status}`}`);
+        } catch {
+          alert(`Failed to update category: Server returned ${response.status} ${response.statusText}`);
+        }
       }
     } catch (error) {
       console.error('Failed to update category', error);
-      alert('Error updating category');
+      alert(`Error: ${error instanceof Error ? error.message : 'Failed to update category'}`);
     }
   };
 
