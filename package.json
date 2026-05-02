@@ -7,7 +7,9 @@
     "backend": "node backend/server.js",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "db:init": "node backend/scripts/initDatabase.js",
+    "db:create-admin": "node backend/scripts/createAdmin.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
