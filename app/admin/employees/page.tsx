@@ -13,11 +13,13 @@ export default function EmployeesPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [formData, setFormData] = useState({ 
+    username: '',
+    email: '',
+    password: '',
     first_name: '', 
     last_name: '', 
     role: 'cashier', 
-    phone: '',
-    status: 'active'
+    phone: ''
   });
 
   useEffect(() => {
@@ -41,8 +43,8 @@ export default function EmployeesPage() {
   };
 
   const handleAddEmployee = async () => {
-    if (!formData.first_name.trim() || !formData.last_name.trim()) {
-      alert('Please fill in employee name');
+    if (!formData.username.trim() || !formData.email.trim() || !formData.password.trim() || !formData.first_name.trim() || !formData.last_name.trim()) {
+      alert('Please fill in all required fields');
       return;
     }
 
@@ -58,12 +60,13 @@ export default function EmployeesPage() {
       });
 
       if (response.ok) {
-        setFormData({ first_name: '', last_name: '', role: 'cashier', phone: '', status: 'active' });
+        setFormData({ username: '', email: '', password: '', first_name: '', last_name: '', role: 'cashier', phone: '' });
         setShowAddModal(false);
         fetchEmployees();
         alert('Employee added successfully');
       } else {
-        alert('Failed to add employee');
+        const errorData = await response.json();
+        alert(`Failed to add employee: ${errorData.message || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Failed to add employee', error);
@@ -181,7 +184,33 @@ export default function EmployeesPage() {
       </Card>
 
       <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title="Add New Employee">
-        <div className="space-y-4">
+        <div className="space-y-4 max-h-96 overflow-y-auto">
+          <div>
+            <label className="block text-sm font-medium mb-2">Username</label>
+            <Input
+              placeholder="Enter username"
+              value={formData.username}
+              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Email</label>
+            <Input
+              type="email"
+              placeholder="Enter email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Password</label>
+            <Input
+              type="password"
+              placeholder="Enter password"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            />
+          </div>
           <div className="grid grid-cols-2 gap-2">
             <div>
               <label className="block text-sm font-medium mb-2">First Name</label>
@@ -219,17 +248,6 @@ export default function EmployeesPage() {
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">Status</label>
-            <select
-              className="w-full px-3 py-2 border rounded-lg text-sm"
-              value={formData.status}
-              onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-            >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
           </div>
           <div className="flex gap-2 pt-4">
             <Button onClick={handleAddEmployee} className="flex-1 bg-purple-600 hover:bg-purple-700">

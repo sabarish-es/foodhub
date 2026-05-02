@@ -57,11 +57,12 @@ export default function CustomersPage() {
         fetchCustomers();
         alert('Customer added successfully');
       } else {
-        alert('Failed to add customer');
+        const errorData = await response.json();
+        alert(`Failed to add customer: ${errorData.message || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Failed to add customer', error);
-      alert('Error adding customer');
+      alert(`Error: ${error instanceof Error ? error.message : 'Failed to add customer'}`);
     }
   };
 
@@ -78,10 +79,13 @@ export default function CustomersPage() {
       if (response.ok) {
         fetchCustomers();
         alert('Customer deleted successfully');
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to delete customer: ${errorData.message || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Failed to delete customer', error);
-      alert('Error deleting customer');
+      alert(`Error: ${error instanceof Error ? error.message : 'Failed to delete customer'}`);
     }
   };
 

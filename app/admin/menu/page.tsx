@@ -95,11 +95,12 @@ export default function MenuPage() {
         fetchData();
         alert('Item added successfully');
       } else {
-        alert('Failed to add item');
+        const errorData = await response.json();
+        alert(`Failed to add item: ${errorData.message || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Failed to add item', error);
-      alert('Failed to add item');
+      alert(`Error: ${error instanceof Error ? error.message : 'Failed to add item'}`);
     }
   };
 
@@ -116,9 +117,13 @@ export default function MenuPage() {
       if (response.ok) {
         fetchData();
         alert('Item deleted successfully');
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to delete item: ${errorData.message || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Failed to delete item', error);
+      alert(`Error: ${error instanceof Error ? error.message : 'Failed to delete item'}`);
     }
   };
 
