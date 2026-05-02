@@ -34,8 +34,9 @@ const navItems = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -44,6 +45,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     if (!token || !user) {
       router.push('/');
+    } else {
+      setIsAuthorized(true);
     }
   }, [router]);
 
@@ -53,15 +56,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     router.push('/');
   };
 
-  if (!mounted) return null;
+  if (!mounted || !isAuthorized) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
       <div
         className={`${
-          sidebarOpen ? 'w-64' : 'w-0'
-        } fixed md:static bg-slate-900 text-white transition-all duration-300 overflow-hidden flex flex-col h-screen md:h-auto z-40`}
+          sidebarOpen ? 'w-64' : 'w-0 md:w-64'
+        } fixed md:static bg-slate-900 text-white transition-all duration-300 overflow-hidden flex flex-col h-screen z-40`}
       >
         <div className="p-6 border-b border-slate-700">
           <div className="flex items-center gap-2">

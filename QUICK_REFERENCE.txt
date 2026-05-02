@@ -1,0 +1,140 @@
+═════════════════════════════════════════════════════════════════════════════
+                    FOODHUB - QUICK REFERENCE GUIDE
+═════════════════════════════════════════════════════════════════════════════
+
+STEP 1: ENVIRONMENT SETUP
+─────────────────────────────────────────────────────────────────────────────
+Location: Create file at: foodhub/backend/.env
+
+Content:
+  DB_HOST=localhost
+  DB_USER=root
+  DB_PASSWORD=sabarish0227E
+  DB_NAME=restaurant_management
+  JWT_SECRET=your_secret_key_change_this_to_something_secure
+  PORT=3001
+  NEXT_PUBLIC_API_URL=http://localhost:3001/api
+
+STEP 2: DATABASE SETUP
+─────────────────────────────────────────────────────────────────────────────
+1. Ensure MySQL is running
+2. Create database: CREATE DATABASE restaurant_management;
+3. Import schema: Use backend/config/schema.sql file
+4. Database will have default admin user created
+
+STEP 3: INSTALLATION
+─────────────────────────────────────────────────────────────────────────────
+Run in project root (foodhub/):
+  
+  npm install
+
+STEP 4: RUN THE APPLICATION
+─────────────────────────────────────────────────────────────────────────────
+Run in project root:
+
+  npm run dev
+
+This starts:
+  - Backend: http://localhost:3001
+  - Frontend: http://localhost:3000
+
+STEP 5: ACCESS THE APPLICATION
+─────────────────────────────────────────────────────────────────────────────
+Open browser: http://localhost:3000
+
+Login Credentials:
+  Username: admin
+  Password: (check database)
+
+After Login:
+  → Admin: See full dashboard with sidebar
+  → Cashier: See POS interface
+  → Kitchen: See kitchen display system
+
+═════════════════════════════════════════════════════════════════════════════
+
+WHAT IF I GET AN ERROR?
+
+❌ "Cannot find module" / "Module not found"
+  → Run: npm install
+
+❌ "EADDRINUSE" (Port already in use)
+  → Change PORT in backend/.env or kill process using port
+
+❌ "Cannot connect to database"
+  → Check MySQL is running
+  → Verify credentials in backend/.env
+  → Check database exists
+
+❌ "Login fails"
+  → Verify user exists in database
+  → Check backend is running (http://localhost:3001/api/health)
+  → Try clearing browser cache
+
+❌ "Sidebar not showing after login"
+  → Hard refresh: Ctrl+Shift+R (or Cmd+Shift+R)
+  → Clear localStorage: F12 → Application → Storage → Clear all
+
+═════════════════════════════════════════════════════════════════════════════
+
+FILE LOCATIONS
+
+Configuration:
+  - backend/.env                    (Environment variables)
+
+Source Code:
+  - app/page.tsx                    (Login page)
+  - app/admin/                      (Admin dashboard)
+  - app/cashier/                    (Cashier POS)
+  - app/kitchen/                    (Kitchen display)
+  - backend/server.js               (API server)
+  - backend/controllers/            (API logic)
+
+Database:
+  - backend/config/schema.sql       (Database schema)
+
+Documentation:
+  - README.md                       (Overview)
+  - SETUP.md                        (Complete setup guide)
+  - CHANGES.md                      (What was fixed)
+
+═════════════════════════════════════════════════════════════════════════════
+
+IMPORTANT NOTES
+
+⚠️  .env file MUST be in backend/ folder, NOT root
+⚠️  Change JWT_SECRET to something secure before production
+⚠️  Database must be created before starting app
+⚠️  Both ports 3000 and 3001 must be available
+
+═════════════════════════════════════════════════════════════════════════════
+
+FEATURES
+
+Admin Dashboard:
+  ✓ Dashboard with analytics
+  ✓ Menu & Category management
+  ✓ Order tracking
+  ✓ Customer management
+  ✓ Employee management
+  ✓ Table management
+  ✓ Reports & analytics
+  ✓ Settings
+
+Cashier:
+  ✓ Create orders
+  ✓ Manage items & quantities
+  ✓ Calculate totals & tax
+  ✓ Checkout
+
+Kitchen:
+  ✓ View pending orders
+  ✓ Update order status
+  ✓ Track preparation progress
+
+═════════════════════════════════════════════════════════════════════════════
+
+For detailed setup instructions, see: SETUP.md
+For changes made, see: CHANGES.md
+
+═════════════════════════════════════════════════════════════════════════════
