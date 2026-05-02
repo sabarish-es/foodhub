@@ -2,15 +2,18 @@
 
 A complete restaurant management system with admin dashboard, cashier POS interface, and kitchen display system. Built with **Next.js 16**, **React 19**, **Node.js**, **Express**, and **MySQL**.
 
-## Quick Setup
+## Quick Start
 
-1. **Database**: Create MySQL database `restaurant_management`
-2. **Environment**: Create `backend/.env` file (see SETUP.md)
-3. **Install**: `npm install`
-4. **Start**: `npm run dev`
-5. **Access**: http://localhost:3000
+**👉 See [RUN_FOODHUB.md](./RUN_FOODHUB.md) for complete step-by-step setup instructions.**
 
-For detailed instructions, see **[SETUP.md](./SETUP.md)**
+This file has everything you need to get FoodHub running in VS Code with:
+- Database setup with all tables
+- Backend configuration
+- Frontend setup
+- How to start both servers
+- Access the application
+- Test all features
+- Troubleshoot common issues
 
 ## Features
 
@@ -90,27 +93,31 @@ All endpoints are protected with JWT authentication except login.
 
 ---
 
-## Setup & Configuration
+## Setup & Running the Project
 
-**See [SETUP.md](./SETUP.md) for complete setup instructions including:**
-- Database creation & schema setup
-- Environment variable configuration
-- Installation & running the project
-- Troubleshooting common issues
+**👉 [RUN_FOODHUB.md](./RUN_FOODHUB.md) - Complete step-by-step guide**
+
+Quick reference:
+1. Setup MySQL database (see RUN_FOODHUB.md STEP 3)
+2. Install backend: `cd backend && npm install`
+3. Install frontend: `cd .. && npm install`
+4. Start backend: `node server.js` (port 3001)
+5. Start frontend: `npm run dev` (port 3000)
+6. Access: http://localhost:3000
 
 ## Default Credentials
 
-After database setup, login with:
 - **Username**: admin
-- **Password**: (check your database setup)
+- **Email**: admin@foodhub.com
+- **Password**: Set it yourself or reset in database
 
 ## Important Notes
 
-1. **Environment File Location**: Create `.env` in the `backend/` folder, NOT in the project root
-2. **Database Setup**: Run the schema from `backend/config/schema.sql` 
-3. **Three Roles**: Admin (full access), Cashier (orders), Kitchen (order prep)
-4. **Port Requirements**: Ensure ports 3000 (frontend) and 3001 (backend) are available
+1. **Two Terminals Required**: One for backend, one for frontend
+2. **Environment File**: Located at `backend/.env` (not project root)
+3. **Database**: Must be created before starting (see RUN_FOODHUB.md)
+4. **Ports**: Frontend uses 3000, Backend uses 3001
 
 ---
 
-**For complete setup and troubleshooting**, see **[SETUP.md](./SETUP.md)**
+**👉 START HERE: [RUN_FOODHUB.md](./RUN_FOODHUB.md)**
