@@ -53,6 +53,18 @@ exports.createCustomer = async (req, res) => {
   }
 };
 
+exports.deleteCustomer = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const connection = await pool.getConnection();
+    await connection.execute('DELETE FROM customers WHERE id = ?', [id]);
+    connection.release();
+    res.json({ message: 'Customer deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 // Employees
 exports.getEmployees = async (req, res) => {
   try {
@@ -79,7 +91,7 @@ exports.createEmployee = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const [userResult] = await connection.execute(
       'INSERT INTO users (username, email, password, role, phone) VALUES (?, ?, ?, ?, ?)',
-      [username, email, hashedPassword, 'cashier', phone]
+      [username, email, hashedPassword, role || 'cashier', phone]
     );
 
     // Create employee
@@ -90,6 +102,34 @@ exports.createEmployee = async (req, res) => {
 
     connection.release();
     res.status(201).json({ id: empResult.insertId, username, email, first_name, last_name });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+exports.deleteEmployee = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const connection = await pool.getConnection();
+    
+    // Get user_id from employee first
+    const [employees] = await connection.execute('SELECT user_id FROM employees WHERE id = ?', [id]);
+    
+    if (employees.length === 0) {
+      connection.release();
+      return res.status(404).json({ message: 'Employee not found' });
+    }
+
+    const userId = employees[0].user_id;
+
+    // Delete employee
+    await connection.execute('DELETE FROM employees WHERE id = ?', [id]);
+    
+    // Delete associated user
+    await connection.execute('DELETE FROM users WHERE id = ?', [userId]);
+    
+    connection.release();
+    res.json({ message: 'Employee deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

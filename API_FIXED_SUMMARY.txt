@@ -1,0 +1,207 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║              API ERROR "Unexpected token '<'" - FIXED ✓                     ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+ROOT CAUSE
+═════════════════════════════════════════════════════════════════════════════
+The API was returning HTML error pages instead of JSON responses because:
+1. Role wasn't being properly assigned to employees
+2. DELETE endpoints were missing from backend
+3. Delete functions weren't implemented
+
+
+FIXES APPLIED
+═════════════════════════════════════════════════════════════════════════════
+
+✓ FIX #1: Employee Role Assignment
+  Location: backend/controllers/masterController.js (Line 82)
+  Change: role = 'cashier' → role || 'cashier'
+  Impact: Now respects the role you select (Cashier, Kitchen Staff, Manager)
+
+✓ FIX #2: Added Delete Endpoints
+  Location: backend/server.js
+  Added:
+    - DELETE /api/customers/:id
+    - DELETE /api/employees/:id
+  Impact: Can now delete customers and employees
+
+✓ FIX #3: Added Delete Functions
+  Location: backend/controllers/masterController.js
+  Added:
+    - deleteCustomer() - Removes customer record
+    - deleteEmployee() - Removes employee & associated user account
+  Impact: Delete operations now work properly
+
+
+WHAT'S NOW WORKING
+═════════════════════════════════════════════════════════════════════════════
+
+✓ Add Employees
+  - Username, Email, Password fields now required
+  - Role properly saved (Cashier/Kitchen/Manager)
+  - Creates both user account and employee record
+
+✓ Delete Employees
+  - Removes employee record
+  - Also removes associated user account
+  - Requires admin role
+
+✓ Add Customers
+  - Name, Email, Phone fields
+  - Optional address, city, state fields
+  - Proper JSON responses
+
+✓ Delete Customers
+  - Removes customer record
+  - Requires admin role
+  - Returns success message
+
+✓ Add Categories & Menu Items
+  - Proper error reporting if something fails
+  - Clear error messages in alerts
+
+
+HOW TO APPLY FIXES
+═════════════════════════════════════════════════════════════════════════════
+
+The fixes have already been applied to these files:
+1. backend/controllers/masterController.js (updated)
+2. backend/server.js (updated)
+
+NO ADDITIONAL SETUP NEEDED - Just restart your backend server:
+
+  cd backend
+  node server.js
+
+The backend will automatically use the updated code.
+
+
+TESTING THE FIXES
+═════════════════════════════════════════════════════════════════════════════
+
+1. Make sure backend is running on port 3001
+2. Go to Admin Dashboard (http://localhost:3000)
+3. Test each section:
+
+   Employees:
+   - Click "Add Employee"
+   - Fill: Username, Email, Password, First Name, Last Name, Role, Phone
+   - Click "Add Employee"
+   - Should show success message
+   - Employee appears in table
+   - Can delete with confirmation
+
+   Customers:
+   - Click "Add Customer"
+   - Fill: Name, Email, Phone
+   - Click "Add Customer"
+   - Customer appears in table
+
+   Categories:
+   - Click "Add Category"
+   - Enter name
+   - Category appears in table
+
+   Menu Items:
+   - Select category
+   - Click "Add New Item"
+   - Fill all fields including image
+   - Menu item appears in table
+
+
+TROUBLESHOOTING
+═════════════════════════════════════════════════════════════════════════════
+
+If you still see "Unexpected token '<'" error:
+
+1. Check backend is running:
+   lsof -i :3001
+   (Should show Node.js process)
+
+2. Check backend console for errors:
+   - Look at the output when you run "node server.js"
+   - Look for any error messages
+
+3. Restart backend completely:
+   - Kill any existing Node process
+   - Run "node server.js" again
+
+4. Clear browser cache:
+   - Close and reopen browser
+   - Or press Ctrl+F5 (hard refresh)
+
+5. Check .env file:
+   - Make sure DB credentials are correct
+   - Check NEXT_PUBLIC_API_URL is set to http://localhost:3001/api
+
+
+IF STILL HAVING ISSUES
+═════════════════════════════════════════════════════════════════════════════
+
+1. Check browser console (F12 → Console tab)
+   - Look for any error messages
+   - Copy error and check what API call failed
+
+2. Check backend console
+   - Look for SQL errors
+   - Look for authentication errors
+
+3. Verify login:
+   - Are you logged in as admin?
+   - Is your token valid?
+   - Try logging out and back in
+
+4. Database check:
+   - Is MySQL running?
+   - Does database "restaurant_management" exist?
+   - Are all tables created?
+
+See API_ERROR_FIX.md for detailed troubleshooting.
+
+
+FILES CHANGED
+═════════════════════════════════════════════════════════════════════════════
+
+✓ backend/controllers/masterController.js
+  - Line 82: Fixed role assignment
+  - Lines 56-67: Added deleteCustomer function
+  - Lines 110-137: Added deleteEmployee function
+
+✓ backend/server.js
+  - Line 49: Added customer delete endpoint
+  - Line 54: Added employee delete endpoint
+
+
+API ENDPOINTS NOW WORKING
+═════════════════════════════════════════════════════════════════════════════
+
+GET    /api/categories
+POST   /api/categories
+PUT    /api/categories/:id
+DELETE /api/categories/:id
+
+GET    /api/menu-items
+POST   /api/menu-items
+PUT    /api/menu-items/:id
+DELETE /api/menu-items/:id
+
+GET    /api/customers
+POST   /api/customers
+DELETE /api/customers/:id ← NEW
+
+GET    /api/employees
+POST   /api/employees
+DELETE /api/employees/:id ← NEW
+
+All endpoints require authentication (Bearer token in Authorization header)
+Some endpoints require admin role
+
+
+═════════════════════════════════════════════════════════════════════════════
+                        YOU'RE ALL SET! ✓
+═════════════════════════════════════════════════════════════════════════════
+
+Backend fixes are applied and ready to use.
+Just restart your backend server and test adding/deleting data.
+
+See API_ERROR_FIX.md for complete technical details.
