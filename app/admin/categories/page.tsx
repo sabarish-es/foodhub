@@ -58,7 +58,8 @@ export default function CategoriesPage() {
         fetchCategories();
         alert('Category added successfully');
       } else {
-        alert('Failed to add category');
+        const errorData = await response.json();
+        alert(`Failed to add category: ${errorData.message || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Failed to add category', error);
@@ -80,7 +81,8 @@ export default function CategoriesPage() {
         fetchCategories();
         alert('Category deleted successfully');
       } else {
-        alert('Failed to delete category');
+        const errorData = await response.json();
+        alert(`Failed to delete category: ${errorData.message || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Failed to delete category', error);
@@ -111,7 +113,8 @@ export default function CategoriesPage() {
         fetchCategories();
         alert('Category updated successfully');
       } else {
-        alert('Failed to update category');
+        const errorData = await response.json();
+        alert(`Failed to update category: ${errorData.message || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Failed to update category', error);
