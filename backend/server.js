@@ -46,10 +46,12 @@ app.put('/api/tables/:id/status', authMiddleware, masterController.updateTableSt
 // Customers Routes
 app.get('/api/customers', authMiddleware, masterController.getCustomers);
 app.post('/api/customers', authMiddleware, roleMiddleware(['cashier', 'admin']), masterController.createCustomer);
+app.delete('/api/customers/:id', authMiddleware, roleMiddleware(['admin']), masterController.deleteCustomer);
 
 // Employees Routes
 app.get('/api/employees', authMiddleware, roleMiddleware(['admin']), masterController.getEmployees);
 app.post('/api/employees', authMiddleware, roleMiddleware(['admin']), masterController.createEmployee);
+app.delete('/api/employees/:id', authMiddleware, roleMiddleware(['admin']), masterController.deleteEmployee);
 
 // Settings Routes
 app.get('/api/settings', authMiddleware, masterController.getSettings);
