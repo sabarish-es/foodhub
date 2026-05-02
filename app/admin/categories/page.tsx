@@ -5,11 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Edit2, Trash2, Plus } from 'lucide-react';
+import { Modal } from '@/components/Modal';
 
 export default function CategoriesPage() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newCategory, setNewCategory] = useState('');
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editName, setEditName] = useState('');
 
   useEffect(() => {
     fetchCategories();
@@ -32,7 +36,10 @@ export default function CategoriesPage() {
   };
 
   const handleAddCategory = async () => {
-    if (!newCategory.trim()) return;
+    if (!newCategory.trim()) {
+      alert('Please enter category name');
+      return;
+    }
 
     const token = localStorage.getItem('token');
     try {
@@ -47,10 +54,68 @@ export default function CategoriesPage() {
 
       if (response.ok) {
         setNewCategory('');
+        setShowAddModal(false);
         fetchCategories();
+        alert('Category added successfully');
+      } else {
+        alert('Failed to add category');
       }
     } catch (error) {
       console.error('Failed to add category', error);
+      alert('Error adding category');
+    }
+  };
+
+  const handleDeleteCategory = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this category?')) return;
+
+    const token = localStorage.getItem('token');
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.ok) {
+        fetchCategories();
+        alert('Category deleted successfully');
+      } else {
+        alert('Failed to delete category');
+      }
+    } catch (error) {
+      console.error('Failed to delete category', error);
+      alert('Error deleting category');
+    }
+  };
+
+  const handleEditCategory = async () => {
+    if (!editName.trim()) {
+      alert('Please enter category name');
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories/${editingId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name: editName }),
+      });
+
+      if (response.ok) {
+        setEditingId(null);
+        setEditName('');
+        fetchCategories();
+        alert('Category updated successfully');
+      } else {
+        alert('Failed to update category');
+      }
+    } catch (error) {
+      console.error('Failed to update category', error);
+      alert('Error updating category');
     }
   };
 
@@ -61,28 +126,18 @@ export default function CategoriesPage() {
         <p className="text-sm md:text-base text-gray-500">Manage your menu categories</p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg md:text-xl">Add New Category</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col md:flex-row gap-2">
-            <Input
-              placeholder="Category name (e.g., Starters, Main Course)"
-              value={newCategory}
-              onChange={(e) => setNewCategory(e.target.value)}
-              className="text-sm"
-            />
-            <Button
-              onClick={handleAddCategory}
-              className="bg-purple-600 hover:bg-purple-700 w-full md:w-auto"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Add
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex gap-4">
+        <div>
+          <h2 className="text-lg md:text-xl font-bold text-slate-900 mb-4">Add New Category</h2>
+          <Button
+            onClick={() => setShowAddModal(true)}
+            className="bg-purple-600 hover:bg-purple-700"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Category
+          </Button>
+        </div>
+      </div>
 
       <Card>
         <CardHeader>
@@ -120,10 +175,17 @@ export default function CategoriesPage() {
                         </span>
                       </td>
                       <td className="py-3 px-2 md:px-4 flex gap-1 md:gap-2">
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            setEditingId(cat.id);
+                            setEditName(cat.name);
+                          }}
+                        >
                           <Edit2 className="w-3 h-3 md:w-4 md:h-4" />
                         </Button>
-                        <Button variant="outline" size="sm" className="text-red-600">
+                        <Button variant="outline" size="sm" className="text-red-600" onClick={() => handleDeleteCategory(cat.id)}>
                           <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
                         </Button>
                       </td>
@@ -135,6 +197,50 @@ export default function CategoriesPage() {
           </div>
         </CardContent>
       </Card>
+
+      <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title="Add New Category">
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-2">Category Name</label>
+            <Input
+              placeholder="Enter category name (e.g., Starters, Main Course)"
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+              className="text-sm"
+            />
+          </div>
+          <div className="flex gap-2 pt-4">
+            <Button onClick={handleAddCategory} className="flex-1 bg-purple-600 hover:bg-purple-700">
+              Add Category
+            </Button>
+            <Button onClick={() => setShowAddModal(false)} variant="outline" className="flex-1">
+              Cancel
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal isOpen={editingId !== null} onClose={() => setEditingId(null)} title="Edit Category">
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-2">Category Name</label>
+            <Input
+              placeholder="Enter category name"
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              className="text-sm"
+            />
+          </div>
+          <div className="flex gap-2 pt-4">
+            <Button onClick={handleEditCategory} className="flex-1 bg-purple-600 hover:bg-purple-700">
+              Update Category
+            </Button>
+            <Button onClick={() => setEditingId(null)} variant="outline" className="flex-1">
+              Cancel
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

@@ -14,7 +14,15 @@ export default function MenuPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
-  const [formData, setFormData] = useState({ name: '', category_id: '', price: '', status: 'active' });
+  const [imagePreview, setImagePreview] = useState('');
+  const [formData, setFormData] = useState({ 
+    name: '', 
+    category_id: '', 
+    price: '', 
+    status: 'active',
+    description: '',
+    image: null as File | null
+  });
 
   useEffect(() => {
     fetchData();
@@ -42,6 +50,18 @@ export default function MenuPage() {
     }
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFormData({ ...formData, image: file });
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleAddItem = async () => {
     if (!formData.name || !formData.category_id || !formData.price) {
       alert('Please fill all fields');
@@ -50,26 +70,32 @@ export default function MenuPage() {
 
     const token = localStorage.getItem('token');
     try {
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('category_id', formData.category_id);
+      formDataToSend.append('price', formData.price);
+      formDataToSend.append('status', formData.status);
+      formDataToSend.append('description', formData.description);
+      if (formData.image) {
+        formDataToSend.append('image', formData.image);
+      }
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/menu-items`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          name: formData.name,
-          category_id: parseInt(formData.category_id),
-          price: parseFloat(formData.price),
-          status: formData.status,
-          description: '',
-        }),
+        body: formDataToSend,
       });
 
       if (response.ok) {
-        setFormData({ name: '', category_id: '', price: '', status: 'active' });
+        setFormData({ name: '', category_id: '', price: '', status: 'active', description: '', image: null });
+        setImagePreview('');
         setShowAddModal(false);
         fetchData();
         alert('Item added successfully');
+      } else {
+        alert('Failed to add item');
       }
     } catch (error) {
       console.error('Failed to add item', error);
@@ -191,7 +217,7 @@ export default function MenuPage() {
       </Card>
 
       <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title="Add New Menu Item">
-        <div className="space-y-4">
+        <div className="space-y-4 max-h-96 overflow-y-auto">
           <div>
             <label className="block text-sm font-medium mb-2">Item Name</label>
             <Input
@@ -216,6 +242,14 @@ export default function MenuPage() {
             </select>
           </div>
           <div>
+            <label className="block text-sm font-medium mb-2">Description</label>
+            <Input
+              placeholder="Enter item description"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            />
+          </div>
+          <div>
             <label className="block text-sm font-medium mb-2">Price (₹)</label>
             <Input
               type="number"
@@ -223,6 +257,20 @@ export default function MenuPage() {
               value={formData.price}
               onChange={(e) => setFormData({ ...formData, price: e.target.value })}
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Item Image</label>
+            <Input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="text-sm"
+            />
+            {imagePreview && (
+              <div className="mt-2">
+                <img src={imagePreview} alt="Preview" className="w-20 h-20 object-cover rounded" />
+              </div>
+            )}
           </div>
           <div>
             <label className="block text-sm font-medium mb-2">Status</label>
@@ -239,7 +287,7 @@ export default function MenuPage() {
             <Button onClick={handleAddItem} className="flex-1 bg-purple-600 hover:bg-purple-700">
               Add Item
             </Button>
-            <Button onClick={() => setShowAddModal(false)} variant="outline" className="flex-1">
+            <Button onClick={() => { setShowAddModal(false); setImagePreview(''); }} variant="outline" className="flex-1">
               Cancel
             </Button>
           </div>

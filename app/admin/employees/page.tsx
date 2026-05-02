@@ -5,11 +5,20 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Edit2, Trash2, Plus, Search } from 'lucide-react';
+import { Modal } from '@/components/Modal';
 
 export default function EmployeesPage() {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [formData, setFormData] = useState({ 
+    first_name: '', 
+    last_name: '', 
+    role: 'cashier', 
+    phone: '',
+    status: 'active'
+  });
 
   useEffect(() => {
     fetchEmployees();
@@ -31,6 +40,57 @@ export default function EmployeesPage() {
     }
   };
 
+  const handleAddEmployee = async () => {
+    if (!formData.first_name.trim() || !formData.last_name.trim()) {
+      alert('Please fill in employee name');
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/employees`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        setFormData({ first_name: '', last_name: '', role: 'cashier', phone: '', status: 'active' });
+        setShowAddModal(false);
+        fetchEmployees();
+        alert('Employee added successfully');
+      } else {
+        alert('Failed to add employee');
+      }
+    } catch (error) {
+      console.error('Failed to add employee', error);
+      alert('Error adding employee');
+    }
+  };
+
+  const handleDeleteEmployee = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this employee?')) return;
+
+    const token = localStorage.getItem('token');
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/employees/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.ok) {
+        fetchEmployees();
+        alert('Employee deleted successfully');
+      }
+    } catch (error) {
+      console.error('Failed to delete employee', error);
+      alert('Error deleting employee');
+    }
+  };
+
   const filteredEmployees = employees.filter((e: any) =>
     `${e.first_name} ${e.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
     e.role.toLowerCase().includes(searchTerm.toLowerCase())
@@ -43,7 +103,7 @@ export default function EmployeesPage() {
           <h1 className="text-2xl md:text-3xl font-bold text-slate-900">Employees</h1>
           <p className="text-sm md:text-base text-gray-500">Manage your staff members</p>
         </div>
-        <Button className="bg-purple-600 hover:bg-purple-700 w-full md:w-auto">
+        <Button onClick={() => setShowAddModal(true)} className="bg-purple-600 hover:bg-purple-700 w-full md:w-auto">
           <Plus className="w-4 h-4 mr-2" />
           Add Employee
         </Button>
@@ -107,7 +167,7 @@ export default function EmployeesPage() {
                         <Button variant="outline" size="sm">
                           <Edit2 className="w-3 h-3 md:w-4 md:h-4" />
                         </Button>
-                        <Button variant="outline" size="sm" className="text-red-600">
+                        <Button variant="outline" size="sm" className="text-red-600" onClick={() => handleDeleteEmployee(employee.id)}>
                           <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
                         </Button>
                       </td>
@@ -119,6 +179,68 @@ export default function EmployeesPage() {
           </div>
         </CardContent>
       </Card>
+
+      <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title="Add New Employee">
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="block text-sm font-medium mb-2">First Name</label>
+              <Input
+                placeholder="First name"
+                value={formData.first_name}
+                onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Last Name</label>
+              <Input
+                placeholder="Last name"
+                value={formData.last_name}
+                onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Role</label>
+            <select
+              className="w-full px-3 py-2 border rounded-lg text-sm"
+              value={formData.role}
+              onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+            >
+              <option value="cashier">Cashier</option>
+              <option value="kitchen">Kitchen Staff</option>
+              <option value="manager">Manager</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Phone</label>
+            <Input
+              placeholder="Enter phone number"
+              value={formData.phone}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Status</label>
+            <select
+              className="w-full px-3 py-2 border rounded-lg text-sm"
+              value={formData.status}
+              onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+            >
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+          <div className="flex gap-2 pt-4">
+            <Button onClick={handleAddEmployee} className="flex-1 bg-purple-600 hover:bg-purple-700">
+              Add Employee
+            </Button>
+            <Button onClick={() => setShowAddModal(false)} variant="outline" className="flex-1">
+              Cancel
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }
