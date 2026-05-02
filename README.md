@@ -2,18 +2,16 @@
 
 A complete restaurant management system with admin dashboard, cashier POS interface, and kitchen display system. Built with **Next.js 16**, **React 19**, **Node.js**, **Express**, and **MySQL**.
 
-## Quick Start
+## Quick Start - 3 SIMPLE STEPS
 
-**👉 See [RUN_FOODHUB.md](./RUN_FOODHUB.md) for complete step-by-step setup instructions.**
+**👉 See [ADMIN_SETUP_SIMPLE.md](./ADMIN_SETUP_SIMPLE.md) to:**
+1. Create admin account (copy-paste SQL command)
+2. Start backend server (Terminal 1: `cd backend && node server.js`)
+3. Start frontend server (Terminal 2: `npm run dev`)
 
-This file has everything you need to get FoodHub running in VS Code with:
-- Database setup with all tables
-- Backend configuration
-- Frontend setup
-- How to start both servers
-- Access the application
-- Test all features
-- Troubleshoot common issues
+Then open http://localhost:3000 and login!
+
+**For detailed setup:** See [RUN_FOODHUB.md](./RUN_FOODHUB.md)
 
 ## Features
 
